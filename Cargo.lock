@@ -385,7 +385,9 @@ dependencies = [
 
 [[package]]
 name = "bevy_2delight_anims"
-version = "0.2.0"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "82a06bb5235bd49d56381310d5210522e1de17c5236656fddf10dc7b00938bf3"
 dependencies = [
  "bevy 0.15.1",
  "bevy_2delight_anims_macros",
@@ -395,6 +397,8 @@ dependencies = [
 [[package]]
 name = "bevy_2delight_anims_macros"
 version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3affd9a3c51ad0f4065015a97162900cb4423765162de1e28a079a341929e2e9"
 dependencies = [
  "bevy 0.14.2",
  "proc-macro2",
@@ -414,7 +418,9 @@ dependencies = [
 
 [[package]]
 name = "bevy_2delight_physics"
-version = "0.2.0"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3204a619656d139adb22b6ccd1c8b4281cc3124d0a01c5d3a316de94f85270d1"
 dependencies = [
  "bevy 0.15.1",
 ]

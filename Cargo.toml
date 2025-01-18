@@ -12,8 +12,10 @@ readme = "README.md"
 
 [dependencies]
 bevy = "0.15"
-bevy_2delight_anims = { path = "../bevy_2delight_anims" }
-bevy_2delight_physics = { path = "../bevy_2delight_physics" }
+# bevy_2delight_anims = { path = "../bevy_2delight_anims" }
+bevy_2delight_anims = "0.2.1"
+# bevy_2delight_physics = { path = "../bevy_2delight_physics" }
+bevy_2delight_physics = "0.2.1"
 rand = "0.8.5"
 
 [[example]]
