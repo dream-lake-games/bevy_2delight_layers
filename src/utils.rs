@@ -34,3 +34,8 @@ pub(crate) fn blank_screen_image(res: &LayersRes, is_overlay: bool) -> Image {
     image.resize(target_extent);
     image
 }
+
+pub fn color_as_vec4(color: Color) -> Vec4 {
+    let linear = color.to_linear();
+    Vec4::new(linear.red, linear.green, linear.blue, 1.0)
+}

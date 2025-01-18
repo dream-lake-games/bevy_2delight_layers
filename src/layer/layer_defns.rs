@@ -31,7 +31,7 @@ impl LayerInternal for LightLayer {
     const RENDER_ORDER: u32 = LIGHT_RENDER_ORDER;
     const IS_OVERLAY: bool = false;
     const ZIX: u32 = 0;
-    const LAYER_POSITION_MODE: LayerPositionMode = LayerPositionMode::Follow;
+    const LAYER_POSITION_MODE: LayerPositionMode = LayerPositionMode::Fixed;
     const LAYER_OUTPUT_MODE: LayerOutputMode = LayerOutputMode::None;
 }
 

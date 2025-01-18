@@ -4,12 +4,15 @@ use bevy::{
     render::view::RenderLayers,
     window::{WindowMode, WindowResolution},
 };
+use bevy_2delight_anims::prelude::AnimPlugin;
 use bevy_2delight_layers::prelude::*;
 use bevy_2delight_physics::prelude::*;
+use light_setup::{Light64Anim, Light64Plugin};
 use physics_setup::{
     physics_update, PhysicsPlugin, TriggerRx, TriggerRxKind, TriggerTx, TriggerTxKind,
 };
 
+mod light_setup;
 mod physics_setup;
 
 const SCREEN_UVEC: UVec2 = UVec2::new(240, 240);
@@ -37,6 +40,8 @@ fn main() {
             ..default()
         },
     });
+    app.add_plugins(AnimPlugin::new());
+    app.add_plugins(Light64Plugin::default());
 
     app.add_systems(Startup, startup);
     app.add_systems(
@@ -120,6 +125,7 @@ fn startup(mut commands: Commands, ass: Res<AssetServer>) {
         StaticRx::single(StaticRxKind::Default, player_hbox.clone()),
         TriggerRx::single(TriggerRxKind::Player, player_hbox.clone()),
         MainStaticLayer::RENDER_LAYERS,
+        LightMan::new(Light64Anim::On),
     ));
 
     commands.spawn(GroundBundle::new(
@@ -169,6 +175,17 @@ fn startup(mut commands: Commands, ass: Res<AssetServer>) {
         },
         FgLayer::RENDER_LAYERS,
         ParallaxX::new_wrapped(1.2, SCREEN_VEC.x * 2.0),
+    ));
+
+    commands.spawn((
+        Name::new("MoreAmbience"),
+        Transform::from_translation(Vec3::Z * -5.0),
+        Sprite {
+            color: Color::linear_rgb(0.4, 0.4, 0.5),
+            custom_size: Some(Vec2::new(120.0, 360.0)),
+            ..default()
+        },
+        MainAmbienceLayer::RENDER_LAYERS,
     ));
 
     commands.spawn((

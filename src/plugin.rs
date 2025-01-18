@@ -1,4 +1,4 @@
-use bevy::{asset::AssetMetaCheck, prelude::*, window::WindowResolution};
+use bevy::{asset::AssetMetaCheck, prelude::*};
 
 use crate::{
     camera::{setup_smush_camera, LayersCameraPlugin},

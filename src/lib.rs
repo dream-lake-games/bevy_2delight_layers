@@ -9,7 +9,7 @@ pub mod prelude {
         },
         Layer,
     };
-    pub use super::light::light_man::{LightAnim, LightMan, LightManPlugin};
+    pub use super::light::light_man::{LightAnim, LightDefnPlugin, LightMan};
     pub use super::parallax::{ParallaxX, ParallaxY};
     pub use super::plugin::LayersPlugin;
     pub use super::{LayersCameraSet, LightAnimSet, LightInteractionSet};

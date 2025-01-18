@@ -2,21 +2,21 @@ use std::collections::VecDeque;
 
 use bevy::prelude::*;
 
-pub const BASE_LIGHT_RENDER_LAYER: usize = 10000;
+pub const BASE_LIGHT_RENDER_LAYER: usize = 100;
 pub const MAX_NUM_LIGHTS: usize = 256;
 
 use bevy::render::camera::RenderTarget;
 use bevy::render::view::RenderLayers;
 
 use crate::camera::FollowDynamicCamera;
-use crate::consts::{ZIX_MAX, ZIX_MIN};
+use crate::consts::{COLOR_NONE, ZIX_MAX, ZIX_MIN};
 use crate::layer::layer_defns::{LightLayer, PRE_LIGHT_RENDER_ORDER};
 use crate::layer::Layer;
 use crate::plugin::LayersRes;
 use crate::utils::blank_screen_image;
 use crate::DUMMY_LAYER_USIZE;
 
-use super::light_cutout_mat::LightCutoutMat;
+use super::light_mat::LightCutoutMat;
 
 /// Facilitates assigning lights to different render layers so that they don't
 /// interfere with each other
@@ -88,7 +88,7 @@ impl LightClaim {
                 Camera {
                     order: PRE_LIGHT_RENDER_ORDER as isize,
                     target: RenderTarget::Image(image_hand.clone()),
-                    clear_color: ClearColorConfig::None,
+                    clear_color: ClearColorConfig::Custom(COLOR_NONE),
                     ..default()
                 },
                 OrthographicProjection {
@@ -97,7 +97,7 @@ impl LightClaim {
                     scale: 1.0,
                     ..OrthographicProjection::default_2d()
                 },
-                RenderLayers::layer(rl_usize),
+                RenderLayers::from_layers(&[rl_usize]),
                 FollowDynamicCamera,
             ))
             .set_parent(res.root_eid())

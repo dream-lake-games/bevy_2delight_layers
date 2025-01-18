@@ -1,14 +1,14 @@
-use bevy::prelude::*;
-use bevy_2delight_anims::AnimSet;
+use bevy::{prelude::*, render::view::RenderLayers};
+use bevy_2delight_anims::{prelude::AnimDefnPlugin, AnimSet};
 
 use crate::LightAnimSet;
 
-use super::light_alloc::LightClaim;
+use super::{light_alloc::LightClaim, light_interaction::register_light_interaction};
 
 /// A trait that will allow lighting systems to use this anim as light source
 pub trait LightAnim: bevy_2delight_anims::prelude::AnimStateMachine {
     /// How far does this light extend? Helps prune light interaction calcs
-    fn radius(&self) -> Option<f32>;
+    fn light_radius(&self) -> Option<f32>;
 }
 
 /// Records what kind of state update needs to happen internally
@@ -43,7 +43,7 @@ fn on_add_light_man<Anim: LightAnim>(
     // Get da claim
     let claim = LightClaim::alloc(&mut world);
     let mut myself = world.get_mut::<LightMan<Anim>>(eid).unwrap();
-    myself.claim = claim;
+    myself.claim = claim.clone();
     let start_state = myself
         .state_update
         .as_mut()
@@ -51,12 +51,10 @@ fn on_add_light_man<Anim: LightAnim>(
         .cloned();
 
     // Make da anim
-    world
-        .commands()
-        .entity(eid)
-        .insert(bevy_2delight_anims::prelude::AnimMan::new(
-            start_state.unwrap_or_default(),
-        ));
+    world.commands().entity(eid).insert(
+        bevy_2delight_anims::prelude::AnimMan::new(start_state.unwrap_or_default())
+            .with_render_layers(RenderLayers::from_layers(&[claim.rl_usize])),
+    );
 }
 /// Responsible for releasing the light claim and removing the underlying anim
 fn on_remove_light_man<Anim: LightAnim>(
@@ -120,16 +118,16 @@ fn drive_light_anims<Anim: LightAnim>(
 }
 
 #[derive(Default)]
-pub struct LightManPlugin<Anim: LightAnim> {
+pub struct LightDefnPlugin<Anim: LightAnim> {
     _pd: std::marker::PhantomData<Anim>,
 }
-impl<Anim: LightAnim> Plugin for LightManPlugin<Anim> {
+impl<Anim: LightAnim> Plugin for LightDefnPlugin<Anim> {
     fn build(&self, app: &mut App) {
-        // TODO: Light interaction per source
+        app.add_plugins(AnimDefnPlugin::<Anim>::default());
+        register_light_interaction::<Anim>(app);
         app.add_systems(
             PostUpdate,
             drive_light_anims::<Anim>
-                .after(bevy_2delight_anims::AnimSet)
                 .in_set(LightAnimSet)
                 .before(AnimSet),
         );

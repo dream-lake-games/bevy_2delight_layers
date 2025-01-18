@@ -11,6 +11,7 @@ use layer_defns::{
 use crate::{
     camera::FollowDynamicCamera,
     consts::{COLOR_NONE, ZIX_MAX, ZIX_MIN},
+    light::light_mat::LightApplyMat,
     plugin::LayersRes,
     utils::blank_screen_image,
 };
@@ -72,7 +73,13 @@ pub(crate) trait LayerInternal: Layer {
     /// Potentially a custom clear color
     const CLEAR_COLOR: Color = COLOR_NONE;
 
-    fn setup(commands: &mut Commands, res: &LayersRes, images: &mut ResMut<Assets<Image>>) {
+    fn setup(
+        commands: &mut Commands,
+        res: &LayersRes,
+        images: &mut ResMut<Assets<Image>>,
+        meshes: &mut ResMut<Assets<Mesh>>,
+        light_apply_mats: &mut ResMut<Assets<LightApplyMat>>,
+    ) {
         let is_smush = Self::_KEY == SmushLayer::_KEY;
         // Render to a target
         let render_target = if is_smush {
@@ -111,7 +118,7 @@ pub(crate) trait LayerInternal: Layer {
         // Maybe do other stuff
         match Self::LAYER_OUTPUT_MODE {
             LayerOutputMode::None => (),
-            LayerOutputMode::Unlit { output_rl } | LayerOutputMode::Lit { output_rl, .. } => {
+            LayerOutputMode::Unlit { output_rl } => {
                 // TODO: Handle lit material differently
                 commands.spawn((
                     Name::new(format!("LayerUnlitOutput_{:?}", Self::default())),
@@ -123,6 +130,25 @@ pub(crate) trait LayerInternal: Layer {
                         custom_size: Some((res.screen_size * res.overlay_growth).as_vec2()),
                         ..default()
                     },
+                    LayerNeedsResizing,
+                ));
+            }
+            LayerOutputMode::Lit {
+                output_rl,
+                base_color,
+            } => {
+                let custom_size = (res.screen_size * res.overlay_growth).as_vec2();
+                let mesh = Mesh::from(Rectangle::new(custom_size.x, custom_size.y));
+                let mesh_hand = meshes.add(mesh);
+                let mat = LightApplyMat::new(Self::TARGET, LightLayer::TARGET, base_color);
+                let mat_hand = light_apply_mats.add(mat);
+                commands.spawn((
+                    Name::new(format!("LayerLitOutput_{:?}", Self::default())),
+                    output_rl,
+                    Transform::from_translation(Vec3::Z * Self::ZIX as f32),
+                    Visibility::default(),
+                    Mesh2d(mesh_hand),
+                    MeshMaterial2d(mat_hand),
                     LayerNeedsResizing,
                 ));
             }
@@ -157,10 +183,20 @@ pub(crate) fn setup_all_layers(
     mut commands: Commands,
     layers_res: Res<LayersRes>,
     mut images: ResMut<Assets<Image>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut light_apply_mats: ResMut<Assets<LightApplyMat>>,
 ) {
     macro_rules! setup_layers_helper {
         ($($layer:ty$(,)?)*) => {
-            $(<$layer>::setup(&mut commands, &layers_res, &mut images);)*
+            $(
+                <$layer>::setup(
+                    &mut commands,
+                    &layers_res,
+                    &mut images,
+                    &mut meshes,
+                    &mut light_apply_mats,
+                );
+            )*
         };
     }
     setup_layers_helper!(
