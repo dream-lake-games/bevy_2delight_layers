@@ -73,8 +73,9 @@ pub(crate) trait LayerInternal: Layer {
     const CLEAR_COLOR: Color = COLOR_NONE;
 
     fn setup(commands: &mut Commands, res: &LayersRes, images: &mut ResMut<Assets<Image>>) {
+        let is_smush = Self::_KEY == SmushLayer::_KEY;
         // Render to a target
-        let render_target = if Self::_KEY == SmushLayer::_KEY {
+        let render_target = if is_smush {
             RenderTarget::default()
         } else {
             let image = blank_screen_image(res, Self::IS_OVERLAY);
@@ -93,7 +94,11 @@ pub(crate) trait LayerInternal: Layer {
             OrthographicProjection {
                 near: ZIX_MIN,
                 far: ZIX_MAX,
-                scale: 1.0,
+                scale: if Self::IS_OVERLAY && !is_smush {
+                    1.0 / res.overlay_growth as f32
+                } else {
+                    1.0
+                },
                 ..OrthographicProjection::default_2d()
             },
             Self::RENDER_LAYERS,

@@ -39,7 +39,10 @@ fn main() {
     });
 
     app.add_systems(Startup, startup);
-    app.add_systems(Update, physics_update.after(PhysicsSet));
+    app.add_systems(
+        Update,
+        (physics_update, camera_follow_player).after(PhysicsSet),
+    );
 
     app.run();
 }
@@ -82,7 +85,6 @@ struct SpikeBundle {
     pos: Pos,
     sprite: Sprite,
     trigger_tx: TriggerTx,
-    rl: RenderLayers,
 }
 impl SpikeBundle {
     fn new(pos: Pos, size: UVec2) -> Self {
@@ -95,12 +97,13 @@ impl SpikeBundle {
                 ..default()
             },
             trigger_tx: TriggerTx::single(TriggerTxKind::Spikes, HBox::new(size.x, size.y)),
-            rl: MainStaticLayer::RENDER_LAYERS,
         }
     }
 }
 
-fn startup(mut commands: Commands) {
+fn startup(mut commands: Commands, ass: Res<AssetServer>) {
+    commands.spawn(DynamicCamera);
+
     let player_hbox = HBox::new(12, 12);
     commands.spawn((
         Name::new("Player"),
@@ -130,12 +133,71 @@ fn startup(mut commands: Commands) {
         UVec2::new(SCREEN_UVEC.x / 2, 12),
     ));
 
-    commands.spawn(SpikeBundle::new(
-        Pos::new(-SCREEN_VEC.x / 2.0, 18.0),
-        UVec2::new(36, 24),
+    commands.spawn((
+        SpikeBundle::new(Pos::new(-SCREEN_VEC.x / 2.0, 18.0), UVec2::new(36, 24)),
+        MainAmbienceLayer::RENDER_LAYERS,
     ));
-    commands.spawn(SpikeBundle::new(
-        Pos::new(SCREEN_VEC.x / 2.0, 18.0),
-        UVec2::new(36, 24),
+    commands.spawn((
+        SpikeBundle::new(Pos::new(SCREEN_VEC.x / 2.0, 18.0), UVec2::new(36, 24)),
+        MainDetailLayer::RENDER_LAYERS,
     ));
+
+    commands.spawn((
+        Name::new("Bg"),
+        Sprite {
+            image: ass.load("platformer/bg.png"),
+            custom_size: Some(SCREEN_VEC),
+            ..default()
+        },
+        BgLayer::RENDER_LAYERS,
+    ));
+    commands.spawn((
+        Name::new("Fg"),
+        Sprite {
+            image: ass.load("platformer/fg.png"),
+            custom_size: Some(SCREEN_VEC),
+            ..default()
+        },
+        FgLayer::RENDER_LAYERS,
+    ));
+
+    commands.spawn((
+        Name::new("OverlayText"),
+        Text2d::new("Overlay Text"),
+        Transform::from_translation(Vec3::new(0.0, SCREEN_VEC.y / 2.0 - 12.0, 0.0)),
+        TextFont {
+            font_size: 18.0,
+            ..default()
+        },
+        OverlayLayer::RENDER_LAYERS,
+    ));
+    commands.spawn((
+        Name::new("MenuText"),
+        Text2d::new("Menu Text"),
+        Transform::from_translation(Vec3::new(0.0, SCREEN_VEC.y / 2.0 - 24.0, 0.0)),
+        TextFont {
+            font_size: 18.0,
+            ..default()
+        },
+        MenuLayer::RENDER_LAYERS,
+    ));
+    commands.spawn((
+        Name::new("TransitionText"),
+        Text2d::new("Transition Text"),
+        Transform::from_translation(Vec3::new(0.0, SCREEN_VEC.y / 2.0 - 36.0, 0.0)),
+        TextFont {
+            font_size: 18.0,
+            ..default()
+        },
+        TransitionLayer::RENDER_LAYERS,
+    ));
+}
+
+fn camera_follow_player(
+    mut camera_q: Query<&mut Pos, (With<DynamicCamera>, Without<Player>)>,
+    player_q: Query<&Pos, (Without<DynamicCamera>, With<Player>)>,
+) {
+    let mut cam_pos = camera_q.single_mut();
+    let player_pos = player_q.single();
+    *cam_pos = player_pos.clone();
 }

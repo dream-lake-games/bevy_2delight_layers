@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
 pub mod prelude {
+    pub use super::camera::DynamicCamera;
     pub use super::layer::{
         layer_defns::{
             BgLayer, FgLayer, LightLayer, MainAmbienceLayer, MainDetailLayer, MainStaticLayer,
@@ -30,6 +31,7 @@ pub struct LightAnimSet;
 #[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct LightInteractionSet;
 
-/// The set that internally handles updating layer cameras. This happens in `Update`, after `PhysicsSet`.
+/// The set that internally handles updating layer cameras. This happens in `PostUpdate`.
+/// NOTE: This is the system that places all the cameras. You must make sure the pos is correct before this system.
 #[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct LayersCameraSet;

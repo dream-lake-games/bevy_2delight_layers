@@ -35,7 +35,7 @@ pub(crate) fn setup_smush_camera(mut commands: Commands, layers_res: Res<LayersR
 }
 
 fn follow_dynamic_camera(
-    dynamic_camera: Query<&bevy_2delight_physics::prelude::IPos, With<DynamicCamera>>,
+    dynamic_camera: Query<&bevy_2delight_physics::prelude::Pos, With<DynamicCamera>>,
     mut followers: Query<&mut Transform, (With<FollowDynamicCamera>, Without<DynamicCamera>)>,
     // camera_shake: Res<CameraShake>,
 ) {
@@ -43,8 +43,8 @@ fn follow_dynamic_camera(
         return;
     };
     for mut tran in &mut followers {
-        tran.translation.x = leader.cur.x as f32;
-        tran.translation.y = leader.cur.y as f32;
+        tran.translation.x = leader.x.round();
+        tran.translation.y = leader.y.round();
     }
 }
 
@@ -52,7 +52,7 @@ pub(crate) struct LayersCameraPlugin;
 impl Plugin for LayersCameraPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
-            Update,
+            PostUpdate,
             (follow_dynamic_camera, resize_layers_as_needed)
                 .after(bevy_2delight_physics::PhysicsSet)
                 .in_set(LayersCameraSet),
