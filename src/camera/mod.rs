@@ -52,7 +52,7 @@ pub(crate) struct LayersCameraPlugin;
 impl Plugin for LayersCameraPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
-            PostUpdate,
+            Update,
             (follow_dynamic_camera, resize_layers_as_needed)
                 .after(bevy_2delight_physics::PhysicsSet)
                 .in_set(LayersCameraSet),

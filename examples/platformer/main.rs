@@ -41,7 +41,9 @@ fn main() {
     app.add_systems(Startup, startup);
     app.add_systems(
         Update,
-        (physics_update, camera_follow_player).after(PhysicsSet),
+        (physics_update, camera_follow_player)
+            .after(PhysicsSet)
+            .before(LayersCameraSet),
     );
 
     app.run();
@@ -150,15 +152,23 @@ fn startup(mut commands: Commands, ass: Res<AssetServer>) {
             ..default()
         },
         BgLayer::RENDER_LAYERS,
+        ParallaxX::new_wrapped(0.3, SCREEN_VEC.x),
+        ParallaxY::new_wrapped(0.3, SCREEN_VEC.y),
     ));
     commands.spawn((
         Name::new("Fg"),
         Sprite {
             image: ass.load("platformer/fg.png"),
-            custom_size: Some(SCREEN_VEC),
+            custom_size: Some(Vec2::new(SCREEN_VEC.x * 3.0, SCREEN_VEC.y)),
+            image_mode: SpriteImageMode::Tiled {
+                tile_x: true,
+                tile_y: false,
+                stretch_value: 1.0,
+            },
             ..default()
         },
         FgLayer::RENDER_LAYERS,
+        ParallaxX::new_wrapped(1.2, SCREEN_VEC.x * 2.0),
     ));
 
     commands.spawn((

@@ -10,13 +10,16 @@ pub mod prelude {
         Layer,
     };
     pub use super::light::light_man::{LightAnim, LightMan, LightManPlugin};
+    pub use super::parallax::{ParallaxX, ParallaxY};
     pub use super::plugin::LayersPlugin;
+    pub use super::{LayersCameraSet, LightAnimSet, LightInteractionSet};
 }
 
 mod camera;
 mod consts;
 mod layer;
 mod light;
+mod parallax;
 mod plugin;
 mod utils;
 

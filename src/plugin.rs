@@ -4,6 +4,7 @@ use crate::{
     camera::{setup_smush_camera, LayersCameraPlugin},
     layer::setup_all_layers,
     light::LayersLightPlugin,
+    parallax::LayersParallaxPlugin,
 };
 
 #[derive(Resource, Clone)]
@@ -55,6 +56,7 @@ impl Plugin for LayersPlugin {
         );
         app.add_plugins(LayersLightPlugin);
         app.add_plugins(LayersCameraPlugin);
+        app.add_plugins(LayersParallaxPlugin);
 
         app.insert_resource(LayersRes {
             screen_size: self.screen_size,
