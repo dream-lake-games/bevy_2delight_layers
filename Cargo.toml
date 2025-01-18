@@ -1,0 +1,20 @@
+[package]
+name = "bevy_2delight_layers"
+description = "A simple 2d camera layering and lighting system that's _delight_ful to use"
+version = "0.2.0"
+edition = "2021"
+authors = ["Mark Pekala <mfpekala@gmail.com>"]
+exclude = ["assets/*"]
+license = "MIT"
+homepage = "https://github.com/dream-lake-games/bevy_2delight_layers"
+repository = "https://github.com/dream-lake-games/bevy_2delight_layers"
+readme = "README.md"
+
+[dependencies]
+bevy = "0.15"
+bevy_2delight_anims = { path = "../bevy_2delight_anims" }
+bevy_2delight_physics = { path = "../bevy_2delight_physics" }
+
+[[example]]
+name = "platformer"
+path = "examples/platformer/main.rs"
