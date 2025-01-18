@@ -1,10 +1,13 @@
 use bevy::prelude::*;
+use camera_shake::CameraShake;
 
 use crate::{
     layer::{layer_defns::SmushLayer, resize_layers_as_needed, Layer, LayerInternal},
     plugin::LayersRes,
     LayersCameraSet,
 };
+
+pub(crate) mod camera_shake;
 
 /// This is the component that marks the actual camera location in the world.
 /// Invariants:
@@ -37,20 +40,23 @@ pub(crate) fn setup_smush_camera(mut commands: Commands, layers_res: Res<LayersR
 fn follow_dynamic_camera(
     dynamic_camera: Query<&bevy_2delight_physics::prelude::Pos, With<DynamicCamera>>,
     mut followers: Query<&mut Transform, (With<FollowDynamicCamera>, Without<DynamicCamera>)>,
-    // camera_shake: Res<CameraShake>,
+    camera_shake: Res<CameraShake>,
 ) {
     let Ok(leader) = dynamic_camera.get_single() else {
         return;
     };
+    let shake_off = camera_shake.get_offset();
     for mut tran in &mut followers {
-        tran.translation.x = leader.x.round();
-        tran.translation.y = leader.y.round();
+        tran.translation.x = (leader.x + shake_off.x).round();
+        tran.translation.y = (leader.y + shake_off.y).round();
     }
 }
 
 pub(crate) struct LayersCameraPlugin;
 impl Plugin for LayersCameraPlugin {
     fn build(&self, app: &mut App) {
+        camera_shake::register_camera_shake(app);
+
         app.add_systems(
             Update,
             (follow_dynamic_camera, resize_layers_as_needed)

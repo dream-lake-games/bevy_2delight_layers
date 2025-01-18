@@ -14,6 +14,7 @@ readme = "README.md"
 bevy = "0.15"
 bevy_2delight_anims = { path = "../bevy_2delight_anims" }
 bevy_2delight_physics = { path = "../bevy_2delight_physics" }
+rand = "0.8.5"
 
 [[example]]
 name = "platformer"

@@ -15,9 +15,8 @@ use bevy_2delight_physics::{
 };
 
 use crate::{
-    layer::Layer,
     plugin::LayersRes,
-    prelude::{LightAnim, LightMan, MainStaticLayer},
+    prelude::{LightAnim, LightMan},
 };
 
 pub(super) const BLACK_MAT_HAND: Handle<ColorMaterial> = Handle::weak_from_u128(12398129387129837);

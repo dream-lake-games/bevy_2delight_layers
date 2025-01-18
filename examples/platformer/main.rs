@@ -46,7 +46,12 @@ fn main() {
     app.add_systems(Startup, startup);
     app.add_systems(
         Update,
-        (physics_update, camera_follow_player)
+        (
+            physics_update,
+            camera_follow_player,
+            toggle_light,
+            shake_big_collisions,
+        )
             .after(PhysicsSet)
             .before(LayersCameraSet),
     );
@@ -227,4 +232,32 @@ fn camera_follow_player(
     let mut cam_pos = camera_q.single_mut();
     let player_pos = player_q.single();
     *cam_pos = player_pos.clone();
+}
+
+fn toggle_light(
+    mut player_q: Query<&mut LightMan<Light64Anim>, With<Player>>,
+    keyboard: Res<ButtonInput<KeyCode>>,
+) {
+    let mut light_man = player_q.single_mut();
+    if keyboard.just_pressed(KeyCode::KeyQ) {
+        light_man.set_state(Light64Anim::Off);
+    }
+    if keyboard.just_pressed(KeyCode::KeyE) {
+        light_man.set_state(Light64Anim::On);
+    }
+}
+
+fn shake_big_collisions(
+    static_colls: Res<StaticColls>,
+    player_q: Query<&StaticRx, With<Player>>,
+    mut shake: ResMut<CameraShake>,
+) {
+    let player_srx = player_q.single();
+    if static_colls
+        .get_refs(&player_srx.coll_keys)
+        .iter()
+        .any(|coll| coll.rx_perp.length_squared() > 500.0)
+    {
+        shake.add_shake(0.1, -1..=1, -2..=2);
+    }
 }

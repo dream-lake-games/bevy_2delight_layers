@@ -409,6 +409,7 @@ dependencies = [
  "bevy 0.15.1",
  "bevy_2delight_anims",
  "bevy_2delight_physics",
+ "rand",
 ]
 
 [[package]]

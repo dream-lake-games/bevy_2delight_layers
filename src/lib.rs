@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
 pub mod prelude {
+    pub use super::camera::camera_shake::CameraShake;
     pub use super::camera::DynamicCamera;
     pub use super::layer::{
         layer_defns::{
